@@ -8,29 +8,32 @@
     
         <!-- 取倒数按钮 -->
         <button @click="calculateInverse('⅟x')" class="function">⅟x</button>
-    
-        <!-- 开根号按钮 -->
-        <button @click="calculateSquareRoot('√x')" class="function">√x</button>
+        <button @click="addLeftParenthesis" class="function">(</button>
+        <button @click="addRightParenthesis" class="function">)</button>
         <button @click="clear" class="function">AC</button>
         <button @click="deleteFn" class="function btn-del">X</button>
         <button @click="calculateToggle" class="function" >±</button>
         <button @click="append('÷')" class="function">÷</button>
+        <button @click="calculateSquareRoot('√x')" class="function">√x</button>
         <button @click="append(7)">7</button>
         <button @click="append(8)">8</button>
         <button @click="append(9)">9</button>
         <button @click="append('*')" class="function">*</button>
+        <button class="function" @click="calculateNaturalLogarithm">ln</button>
         <button @click="append(4)">4</button>
         <button @click="append(5)">5</button>
         <button @click="append(6)">6</button>
         <button @click="append('-')" class="function">-</button>
+        <button class="function" @click="calculateFactorial">x!</button>
         <button @click="append(1)">1</button>
         <button @click="append(2)">2</button>
         <button @click="append(3)">3</button>
         <button @click="append('+')" class="function" >+</button>
+        <button class="function" @click="calculateExponential">e^x</button>
         <button @click="calculatePercentage">%</button>
         <button @click="append(0)">0</button>
         <button @click="append('.')">.</button>
-        <button @click="calculate" class="function">=</button>
+        <button @click="calculate" class="function calcu">=</button>
        
     </div>
 </template>
@@ -59,7 +62,9 @@ export default {
             cSound: 0,
             buttonSound: null,
             isSound:true,
-            base:0
+            base:0,
+            leftkuohao:0,
+            rightkuohao:0
         }
     },
     methods: {
@@ -117,7 +122,7 @@ export default {
             this.isOperatorAdded = false;
         },//点击等号时计算结果
         calculateToggle() {
-            this.playSounds()
+            
             if (this.isOperatorAdded || !this.isStarted) {
                 return
             } //如果刚输入符号，或者没开始计算时禁用
@@ -125,16 +130,14 @@ export default {
             this.calculate()
         },//点击正负号时
         calculatePercentage() {
-            this.playSounds()
             if (this.isOperatorAdded || !this.isStarted) {
                 return
             }
             this.equation = this.equation + '*0.01'
-            this.calculate()
+            this.sendEquation()
         },//点击百分比符号时
 
         clear() {
-            this.playSounds()
             this.equation = '0'
             this.isDecimalAdded = false
             this.isOperatorAdded = false
@@ -143,7 +146,7 @@ export default {
         },//点击AC号时,所有状态置于初始状态即可
 
         deleteFn() {
-            this.playSounds()
+            
             if (this.equation.length === 0) {
                 this.equation = '0';
             } else {
@@ -181,17 +184,57 @@ export default {
             this.sendEquation();
         },
         calculateSquareRoot() {
-             // 从等式中获取要进行倒数操作的数字
-            // 使用正则表达式提取等式中的数字
             let number = parseFloat(this.equation.match(/[\d.]+$/)[0]);
             let result =  Math.sqrt(number);
             // 更新等式
             this.equation = this.equation.replace(/[\d.]+$/, result);
             this.sendEquation();
         },
-
-        // 其他方法
-    
+       calculateFactorial() {
+            let number = parseFloat(this.equation.match(/[\d.]+$/)[0]);
+            let result = 1;
+            for (let i = 2; i <= number; i ++) {
+                result *= i;
+            }
+            // 更新等式
+            this.equation = this.equation.replace(/[\d.]+$/, result);
+            this.sendEquation();
+       },
+       calculateExponential() {
+            let number = parseFloat(this.equation.match(/[\d.]+$/)[0]);
+            let result = Math.exp(number);
+            // 更新等式
+            this.equation = this.equation.replace(/[\d.]+$/, result.toFixed(2).toString());
+            this.sendEquation();
+       },
+       calculateNaturalLogarithm() {
+            let number = parseFloat(this.equation.match(/[\d.]+$/)[0]);
+            let result = Math.log(number);
+            // 更新等式
+            this.equation = this.equation.replace(/[\d.]+$/, result.toFixed(2).toString());
+            this.sendEquation();
+       },
+       // 添加左括号
+        addLeftParenthesis() {
+            if (this.equation === '0') {
+                this.equation = '('
+                this.leftkuohao++;
+            }
+           else if(this.isOperator(this.equation.slice(-1))) {
+                this.leftkuohao++;
+                this.equation += '('
+           }
+            
+            this.sendEquation();
+        },
+        // 添加右括号
+        addRightParenthesis() {
+            if (this.rightkuohao < this.leftkuohao && !this.isOperator(this.equation.slice(-1))) {
+                this.equation += ')';
+                this.sendEquation();
+                this.leftkuohao--;
+            }
+        },
         sendEquation() {
             this.playSounds()
             pubsub.publish('getEquation',this.equation)
@@ -201,14 +244,12 @@ export default {
             this.cSound = indexSound;
         },
         playSounds() {
-            
             if(!this.isSound) return
             this.buttonSound = new Audio(this.keypodSounds[this.cSound]);
             this.buttonSound.play();
         },
         isOpen(isOpen) {
             this.isSound = isOpen;
-           
         }
     },
     mounted() {
@@ -224,13 +265,13 @@ export default {
     margin-top: 10px;
     display: grid;
     grid-template-rows: repeat(6, 1fr);
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     grid-column-gap:10px;
     grid-row-gap:13px;
     }
 
+
     .buttons button {
-   
     font-size: 40px;
     font-family: Helvetica, sans-serif;
     border-radius: 15%;
@@ -245,6 +286,13 @@ export default {
     background-color: #0a080194;
     color: rgba(47, 255, 71, 0.434);
     }   
+
+    .buttons .calcu {
+    grid-area: 6/4/7/6;
+    border-radius: 5%;
+    background-color: rgba(0, 255, 157, 0.275);
+    color: #fff;
+    }
 
     .buttons button:active {
     box-shadow: -4px -4px 10px -8px rgba(255, 255, 255, 1) inset, 4px 4px 10px -8px rgba(0, 0, 0, .3) inset;
