@@ -16,7 +16,12 @@
                     <span @click="changeBgdImageAdd" class="right"></span>
                 </button>
             </li>
-            <li></li>
+            <li>
+               <button @click="changeOpen" class="is-sound-button">
+                <span class="font-icon">{{ keypodTone.isopen ? '' : '' }}</span>
+                <span class="font">{{ keypodTone.isopen ? 'close sounds' : 'open sounds' }}</span>
+               </button>
+            </li>
             <li></li>
             <li></li>
             <li></li>
@@ -35,6 +40,9 @@ export default {
             navVisble: false,
             bodyMode: {
                 'white-mode': false
+            },
+            keypodTone: {
+                isopen:true
             },
             currentImage: 0,
             currentSound: 0
@@ -62,6 +70,10 @@ export default {
             if(this.currentSound == 3) this.currentSound = 0;
             else this.currentSound++;
             this.$bus.$emit('changeKeypod',this.currentSound)
+        },
+        changeOpen(){
+            this.keypodTone.isopen = !this.keypodTone.isopen;
+            this.$bus.$emit('changeSoundOpen', this.keypodTone.isopen)
         }
     },
     mounted() {
@@ -174,6 +186,19 @@ export default {
 .change-bgd-button .right {
   right: 5px;
 }
+
+.is-sound-button {
+    font-family: icomoon;
+    line-height: 18px;
+    color: #11100a;
+    top: 186px;
+    background-color: #31c93491;
+}
+
+.is-sound-button .font-icon {
+    color: pink;
+}
+
 .nav button:focus {
     outline: none;
 }

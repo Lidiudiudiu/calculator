@@ -41,13 +41,14 @@ export default {
                 'white-mode': false
             },
             keypodSounds: [
-                require('../../public/sounds/碎骨.mp3'),
                 require('../../public/sounds/fuge.mp3'),
+                require('../../public/sounds/碎骨.mp3'),
                 require('../../public/sounds/pia.mp3'),
                 require('../../public/sounds/su.mp3')
             ],
             cSound: 0,
-            buttonSound: null
+            buttonSound: null,
+            isSound:true
         }
     },
     methods: {
@@ -146,14 +147,19 @@ export default {
             this.cSound = indexSound;
         },
         playSounds() {
-            console.log('我调用了')
+            
+            if(!this.isSound) return
             this.buttonSound = new Audio(this.keypodSounds[this.cSound]);
             this.buttonSound.play();
+        },
+        isOpen(isOpen) {
+            this.isSound = isOpen;
+            console.log(this.isSound);
         }
     },
     mounted() {
         this.$bus.$on('changeKeypod', this.cutSound)
-        
+        this.$bus.$on('changeSoundOpen',this.isOpen)
     }
    
 }
