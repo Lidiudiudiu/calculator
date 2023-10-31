@@ -7,7 +7,7 @@
                 <span class="font">{{ bodyMode['white-mode'] ? 'dark mode' : 'light mode' }}</span>
             </button></li>
             <li>
-            <button @click="changeSound" class="voice-turn-button"><span class="font-change"></span> Change Keyvoice</button>
+            <button @click="changeSound" class="voice-turn-button" :style="{ 'background-color': backgroundColor[currentSound] }"><span class="font-change"></span> Change Keyvoice</button>
             </li>
             <li>
                 <button class="change-bgd-button">
@@ -17,7 +17,7 @@
                 </button>
             </li>
             <li>
-               <button @click="changeOpen" class="is-sound-button">
+               <button @click="changeOpen" class="is-sound-button" >
                 <span class="font-icon">{{ keypodTone.isopen ? '' : '' }}</span>
                 <span class="font">{{ keypodTone.isopen ? 'close sounds' : 'open sounds' }}</span>
                </button>
@@ -44,6 +44,9 @@ export default {
             keypodTone: {
                 isopen:true
             },
+            backgroundColor: [
+                '#5856dd','red','pink','blue'
+            ],
             currentImage: 0,
             currentSound: 0
         }

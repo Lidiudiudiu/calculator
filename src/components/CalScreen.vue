@@ -2,7 +2,7 @@
   <div class="screen" :style="{ 'background-image': 'url(' + backgroundImage + ')' }">
         <button @click="changeNav" class="nav-button open-button" ></button>
         <div class="result" >
-            {{ equation }}
+            {{ equation.replace('**', '∧') }}
         </div>
     </div>
 </template>

@@ -1,5 +1,16 @@
 <template>
   <div class="buttons">
+        <!-- 取多次方按钮 -->
+        <button @click="calculatePower()" class="function">^</button>
+    
+        <!-- 取平方按钮 -->
+        <button @click="calculatePower2('x^2')" class="function">x^2</button>
+    
+        <!-- 取倒数按钮 -->
+        <button @click="calculateInverse('⅟x')" class="function">⅟x</button>
+    
+        <!-- 开根号按钮 -->
+        <button @click="calculateSquareRoot('√x')" class="function">√x</button>
         <button @click="clear" class="function">AC</button>
         <button @click="deleteFn" class="function btn-del">X</button>
         <button @click="calculateToggle" class="function" >±</button>
@@ -20,6 +31,7 @@
         <button @click="append(0)">0</button>
         <button @click="append('.')">.</button>
         <button @click="calculate" class="function">=</button>
+       
     </div>
 </template>
 
@@ -34,9 +46,7 @@ export default {
             isDecimalAdded: false,  //是否添加小数位，这是为了防止输入如两个小数点
             isOperatorAdded: false, //是否已经点击过运算符号 + — * /
             isStarted: false, //是否已经输入数据，在正负号和百分运算时有用
-            classObj: {
-                visible: false
-            },
+            isbased: false,
             bodyMode: {
                 'white-mode': false
             },
@@ -48,13 +58,14 @@ export default {
             ],
             cSound: 0,
             buttonSound: null,
-            isSound:true
+            isSound:true,
+            base:0
         }
     },
     methods: {
         isOperator(character) {
-            return ['+', '-', '*', '÷'].indexOf(character) > -1  //大于-1就代表已经有符号输入了
-        },  //判断character是否为加，减，乘，除符号
+            return ['+', '-', '*', '÷','^'].indexOf(character) > -1  //大于-1就代表已经有符号输入了
+        },  //判断character是否为加，减，乘，除,次幂符号
         append(character) {
             this.playSounds()
             if (this.equation === '0' && !this.isOperator(character)) {
@@ -73,12 +84,17 @@ export default {
             if (!this.isOperator(character)) {
                 if (character === '.' && this.isDecimalAdded) {
                     return
-                }//如果已经输入过.了，不允许继续输入.
+                }
+                //如果已经输入过.了，不允许继续输入.
                 if (character === '.') {
                     this.isDecimalAdded = true;
                     this.isOperatorAdded = true;
                 } else {
                     this.isOperatorAdded = false;
+                    if(this.isbased) {
+                        this.isbased = false;
+                        this.sendEquation()
+                    }
                 }
                 this.equation += '' + character
                 this.sendEquation()
@@ -95,7 +111,7 @@ export default {
         calculate() {
             this.playSounds();
             let result = this.equation.replace(new RegExp('x', 'g'), '*').replace(new RegExp('÷', 'g'), '/')
-            this.equation = parseFloat(eval(result).toFixed(9)).toString();
+            this.equation = parseFloat(eval(result).toFixed(6)).toString();
             this.sendEquation()
             this.isDecimalAdded = false;
             this.isOperatorAdded = false;
@@ -138,6 +154,44 @@ export default {
             }
             this.sendEquation()
         },//点击删除号时
+        calculatePower() {
+            this.playSounds()
+            this.base = parseFloat(this.equation.match(/[\d.]+$/)[0]);
+            this.isbased = true;
+            this.equation += '**';
+            this.sendEquation()
+        },
+       calculatePower2() {
+            // 使用正则表达式提取等式中的数字
+            let number = parseFloat(this.equation.match(/[\d.]+$/)[0]);
+            
+            // 计算平方结果
+            let result = Math.pow(number, 2);
+            // 更新等式
+            this.equation = this.equation.replace(/[\d.]+$/, result);
+            this.sendEquation();
+        },
+        calculateInverse() {
+            // 从等式中获取要进行倒数操作的数字
+          // 使用正则表达式提取等式中的数字
+            let number = parseFloat(this.equation.match(/[\d.]+$/)[0]);
+            let result = 1/number;
+            // 更新等式
+            this.equation = this.equation.replace(/[\d.]+$/, result);
+            this.sendEquation();
+        },
+        calculateSquareRoot() {
+             // 从等式中获取要进行倒数操作的数字
+            // 使用正则表达式提取等式中的数字
+            let number = parseFloat(this.equation.match(/[\d.]+$/)[0]);
+            let result =  Math.sqrt(number);
+            // 更新等式
+            this.equation = this.equation.replace(/[\d.]+$/, result);
+            this.sendEquation();
+        },
+
+        // 其他方法
+    
         sendEquation() {
             this.playSounds()
             pubsub.publish('getEquation',this.equation)
@@ -154,7 +208,7 @@ export default {
         },
         isOpen(isOpen) {
             this.isSound = isOpen;
-            console.log(this.isSound);
+           
         }
     },
     mounted() {
@@ -167,18 +221,19 @@ export default {
 
 <style>
     .buttons {
+    margin-top: 10px;
     display: grid;
-    grid-template-rows: repeat(5, 1fr);
+    grid-template-rows: repeat(6, 1fr);
     grid-template-columns: repeat(4, 1fr);
-    grid-gap: 10px;
+    grid-column-gap:10px;
+    grid-row-gap:13px;
     }
 
     .buttons button {
-    width: 70px;
-    height: 70px;
+   
     font-size: 40px;
     font-family: Helvetica, sans-serif;
-    border-radius: 50%;
+    border-radius: 15%;
     background-color: linear-gradient(135deg, rgba(230, 230, 230, 1) 0%, rgba(246, 246, 236, 1) 100%);
     box-shadow: -4px -4px 10px -8px rgba(255, 255, 255, 1), 4px 4px 10px -8px rgba(0, 0, 0, .3);
     color: #999;
