@@ -1,17 +1,18 @@
 <template>
-  <div class="nav" :class="{visible : navVisble}">
+  <transition name="nav">
+    <div v-show="navVisble" class="nav">
         <ul>
             <li> <button @click="changeBgd" class="mode-button" >
                 <span class="font-icon">{{ bodyMode['white-mode'] ? '' : '' }}</span>
                 <span class="font">{{ bodyMode['white-mode'] ? 'dark mode' : 'light mode' }}</span>
             </button></li>
             <li>
-            <button  class="bgd-button" ></button>
+            <button @click="changeSound" class="voice-turn-button"><span class="font-change"></span> Change Keyvoice</button>
             </li>
             <li>
                 <button class="change-bgd-button">
                     <span @click="changeBgdImageLess" class="left"></span>
-                    切换背景图片
+                    Change Image
                     <span @click="changeBgdImageAdd" class="right"></span>
                 </button>
             </li>
@@ -22,6 +23,7 @@
             <li></li>
         </ul>
     </div>
+  </transition>
 </template>
 
 <script>
@@ -34,7 +36,8 @@ export default {
             bodyMode: {
                 'white-mode': false
             },
-            currentImage: 0
+            currentImage: 0,
+            currentSound: 0
         }
     },
     methods: {
@@ -55,6 +58,11 @@ export default {
             if (this.currentImage == -1) this.currentImage = 11
             this.$bus.$emit('changeBackgroundImage', this.currentImage)
         },
+        changeSound() {
+            if(this.currentSound == 3) this.currentSound = 0;
+            else this.currentSound++;
+            this.$bus.$emit('changeKeypod',this.currentSound)
+        }
     },
     mounted() {
         this.$bus.$on('changeVisible',this.changeNav)
@@ -73,14 +81,26 @@ export default {
     height: 100vh;
     z-index: 1;
     background-color: rgba(16, 12, 12, 0.976);
-    transform: translateX(-100%);
     transition: all 0.3s;
 }
 
-.visible {
-    transform: translateX(0);
-    transition: all 0.3s;
+.nav-enter,
+.nav-leave-to {
+    transform: translateX(-100%);
 }
+
+/* 进入的过程、离开的过程 */
+.nav-enter-active,
+.nav-leave-active {
+    transition: 1.5s ease;
+}
+
+/* 进入的终点、离开的起点 */
+.nav-enter-to,
+.nav-leave {
+    transform: translateX(0);
+}
+
 
 
 .nav .font-icon {
@@ -113,7 +133,8 @@ export default {
     background-color: var(--primary-color);
 }
 
-.nav .bgd-button {
+.nav .voice-turn-button {
+    font-family: icomoon;
     top: 106px;
     background-color: #5856dd;
 }

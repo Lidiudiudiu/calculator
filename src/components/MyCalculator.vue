@@ -57,7 +57,7 @@ export default {
 }
 
 .calculator.white-mode {
-    background-color: rgba(162, 161, 161, 0.619);
+    background-color: rgb(162 161 161);
     --primary-color: #fff;
     --secondary-color: #333;
 }

@@ -39,7 +39,15 @@ export default {
             },
             bodyMode: {
                 'white-mode': false
-            }
+            },
+            keypodSounds: [
+                require('../../public/sounds/碎骨.mp3'),
+                require('../../public/sounds/fuge.mp3'),
+                require('../../public/sounds/pia.mp3'),
+                require('../../public/sounds/su.mp3')
+            ],
+            cSound: 0,
+            buttonSound: null
         }
     },
     methods: {
@@ -47,6 +55,7 @@ export default {
             return ['+', '-', '*', '÷'].indexOf(character) > -1  //大于-1就代表已经有符号输入了
         },  //判断character是否为加，减，乘，除符号
         append(character) {
+            this.playSounds()
             if (this.equation === '0' && !this.isOperator(character)) {
                 //当equation的值为零且输入不是符号时
                 if (character === '.') {
@@ -83,6 +92,7 @@ export default {
 
         },//点击加减乘除和小数位时
         calculate() {
+            this.playSounds();
             let result = this.equation.replace(new RegExp('x', 'g'), '*').replace(new RegExp('÷', 'g'), '/')
             this.equation = parseFloat(eval(result).toFixed(9)).toString();
             this.sendEquation()
@@ -90,6 +100,7 @@ export default {
             this.isOperatorAdded = false;
         },//点击等号时计算结果
         calculateToggle() {
+            this.playSounds()
             if (this.isOperatorAdded || !this.isStarted) {
                 return
             } //如果刚输入符号，或者没开始计算时禁用
@@ -97,6 +108,7 @@ export default {
             this.calculate()
         },//点击正负号时
         calculatePercentage() {
+            this.playSounds()
             if (this.isOperatorAdded || !this.isStarted) {
                 return
             }
@@ -105,14 +117,16 @@ export default {
         },//点击百分比符号时
 
         clear() {
+            this.playSounds()
             this.equation = '0'
             this.isDecimalAdded = false
-            this.isOperatoradded = false
+            this.isOperatorAdded = false
             this.isStarted = false
             this.sendEquation()
         },//点击AC号时,所有状态置于初始状态即可
 
         deleteFn() {
+            this.playSounds()
             if (this.equation.length === 0) {
                 this.equation = '0';
             } else {
@@ -124,9 +138,23 @@ export default {
             this.sendEquation()
         },//点击删除号时
         sendEquation() {
+            this.playSounds()
             pubsub.publish('getEquation',this.equation)
+        },
+        cutSound(indexSound) {
+            this.playSounds()
+            this.cSound = indexSound;
+        },
+        playSounds() {
+            console.log('我调用了')
+            this.buttonSound = new Audio(this.keypodSounds[this.cSound]);
+            this.buttonSound.play();
         }
     },
+    mounted() {
+        this.$bus.$on('changeKeypod', this.cutSound)
+        
+    }
    
 }
 </script>

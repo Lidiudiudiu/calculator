@@ -1,5 +1,5 @@
 <template>
-  <div class="screen" :style="{ 'backgroundImage': `url('${backgroundImages[cImage]}')` }">
+  <div class="screen" :style="{ 'background-image': 'url(' + backgroundImage + ')' }">
         <button @click="changeNav" class="nav-button open-button" ></button>
         <div class="result" >
             {{ equation }}
@@ -16,23 +16,29 @@ export default {
             equation: '0',
             navVisible: false,
             backgroundImages: [
-                '../../public/images/card1.jpg',
-                '../../public/images/card2.jpg',
-                '../../public/images/card3.jpg',
-                '../../public/images/card4.jpg',
-                '../../public/images/card5.jpg',
-                '../../public/images/card6.webp',
-                '../../public/images/card7.jpg',
-                '../../public/images/card8.jpg',
-                '../../public/images/card9.jpg',
-                '../../public/images/card10.jpg',
-                '../../public/images/card11.jpg',
-                '../../public/images/card12.jpg'
+                require('../../public/images/card1.jpg'),
+                require('../../public/images/card2.jpg'),
+                require('../../public/images/card3.jpg'),
+                require('../../public/images/card4.jpg'),
+                require('../../public/images/card5.jpg'),
+                require('../../public/images/card6.webp'),
+                require('../../public/images/card7.png'),
+                require('../../public/images/card8.jpg'),
+                require('../../public/images/card9.jpg'),
+                require('../../public/images/card10.jpg'),
+                require('../../public/images/card11.png'),
+                require('../../public/images/card12.webp'),
+               
             ],
-           cImage:0
+           cImage:0,
+           
         }
     },
-    
+    computed: {
+        backgroundImage() {
+            return this.backgroundImages[this.cImage];
+        }
+    },
     methods: {
         getData(_,data) {
             this.equation = data
@@ -43,13 +49,14 @@ export default {
         },
         cutImage(imageNum) {
             this.cImage = imageNum
-            console.log(this.cImage)
-        }
+        },
+        
     },
    
     mounted() {
        pubsub.subscribe('getEquation',this.getData)
        this.$bus.$on('changeBackgroundImage',this.cutImage)
+       
     },
     beforeDestroy() {
          pubsub.unsubscribe('getEquation');
