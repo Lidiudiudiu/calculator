@@ -54,9 +54,9 @@ export default {
                 'white-mode': false
             },
             keypodSounds: [
+                require('../../public/sounds/pia.mp3'),
                 require('../../public/sounds/fuge.mp3'),
                 require('../../public/sounds/碎骨.mp3'),
-                require('../../public/sounds/pia.mp3'),
                 require('../../public/sounds/su.mp3')
             ],
             cSound: 0,
@@ -142,6 +142,9 @@ export default {
             this.isDecimalAdded = false
             this.isOperatorAdded = false
             this.isStarted = false
+            this.isbased = false
+            this.rightkuohao = 0
+            this.leftkuohao = 0
             this.sendEquation()
         },//点击AC号时,所有状态置于初始状态即可
 
@@ -224,7 +227,7 @@ export default {
                 this.leftkuohao++;
                 this.equation += '('
            }
-            
+            console.log('左',this.leftkuohao,this.rightkuohao)
             this.sendEquation();
         },
         // 添加右括号
@@ -234,6 +237,7 @@ export default {
                 this.sendEquation();
                 this.leftkuohao--;
             }
+            console.log('右', this.leftkuohao,this.rightkuohao)
         },
         sendEquation() {
             this.playSounds()

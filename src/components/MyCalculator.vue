@@ -1,5 +1,5 @@
 <template>
-     <div class="calculator" :class="{'white-mode':white_mode}">
+     <div class="calculator black-mode" :class="{'white-mode':white_mode}">
         <!-- 计算器界面 -->
         <BarTop></BarTop>
         <!-- 一个只起美观作用的小图标 -->
@@ -49,12 +49,13 @@ export default {
     position: relative;
     height: 800px;
     width: 500px;
-    background-color: rgba(253, 252, 252, 0.195);
+    background-color: rgba(0, 0, 0, 0.704);
     background-size: cover;
     border-radius: 5px 10px 10px 5px;
     transition: all 0.5s ease-in;
     overflow: hidden;
 }
+
 
 .calculator.white-mode {
     background-color: rgb(162 161 161);
